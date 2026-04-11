@@ -3,541 +3,318 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PageTurner — Book Store by Nivetha S</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Folioverse — Books by Nivetha S</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --ink: #1a1208;
-  --paper: #faf7f2;
-  --cream: #f5ede0;
-  --gold: #c8963e;
-  --gold-light: #e8b96a;
-  --rust: #c0472b;
-  --sage: #5a7a5e;
-  --muted: #8a7d6b;
-  --border: #e2d8cc;
-  --white: #ffffff;
-  --shadow: 0 4px 24px rgba(26,18,8,0.10);
-  --shadow-lg: 0 12px 48px rgba(26,18,8,0.18);
-  --radius: 12px;
-  --radius-sm: 8px;
+  --bg:#0d0d0d;--surface:#161616;--card:#1c1c1c;--border:#2a2a2a;--border2:#333;
+  --text:#f0ece4;--muted:#888;--muted2:#555;
+  --amber:#e8a430;--amber2:#f5c460;--green:#3d9970;--red:#c0392b;--blue:#2e86de;
+  --radius:14px;--radius-sm:8px;--shadow:0 4px 32px rgba(0,0,0,.55);--shadow2:0 2px 12px rgba(0,0,0,.4);
 }
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.6}
+button{cursor:pointer;font-family:inherit}
+input,textarea,select{font-family:inherit}
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+/* TOAST */
+#toastZone{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:var(--card);border:1px solid var(--border2);color:var(--text);padding:12px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;max-width:280px;line-height:1.4;box-shadow:var(--shadow2);pointer-events:all;animation:toastIn .3s ease,toastOut .4s 2.6s forwards}
+.toast.success{border-color:var(--green)}.toast.error{border-color:var(--red)}
+@keyframes toastIn{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateX(60px)}}
 
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--paper);
-  color: var(--ink);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
+/* NAVBAR */
+#navbar{position:sticky;top:0;z-index:800;background:rgba(13,13,13,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 24px;height:62px}
+.brand{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--amber);letter-spacing:.5px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.brand em{font-style:italic;color:var(--amber2)}
+.search-wrap{flex:1;max-width:460px;margin:0 12px;position:relative;display:flex;align-items:center}
+.search-wrap input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:40px;padding:9px 40px 9px 40px;color:var(--text);font-size:13.5px;outline:none;transition:border .2s,box-shadow .2s}
+.search-wrap input:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(232,164,48,.12)}
+.search-wrap input::placeholder{color:var(--muted2)}
+.search-icon{position:absolute;left:14px;color:var(--muted);pointer-events:none;flex-shrink:0}
+.search-clear{position:absolute;right:14px;background:none;border:none;color:var(--muted);font-size:16px;display:none;padding:0;line-height:1;transition:color .15s}
+.search-clear.show{display:block}.search-clear:hover{color:var(--red)}
+.nav-links{display:flex;align-items:center;gap:4px;margin-left:auto;flex-shrink:0}
+.nav-btn{background:none;border:none;color:var(--muted);padding:8px 12px;border-radius:8px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px;transition:all .18s;white-space:nowrap}
+.nav-btn:hover{background:var(--surface);color:var(--text)}.nav-btn.active{background:rgba(232,164,48,.12);color:var(--amber)}
+.cart-count{background:var(--amber);color:#000;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center}
 
-/* ─── TOAST ─── */
-#toast {
-  position: fixed; bottom: 28px; right: 28px; z-index: 9999;
-  display: flex; flex-direction: column; gap: 10px;
-}
-.toast-msg {
-  background: var(--ink); color: var(--paper);
-  padding: 12px 20px; border-radius: var(--radius-sm);
-  font-size: 14px; font-weight: 500;
-  animation: slideIn .3s ease, fadeOut .4s 2.6s forwards;
-  max-width: 300px;
-}
-@keyframes slideIn { from { transform: translateX(120%); opacity:0; } to { transform: translateX(0); opacity:1; } }
-@keyframes fadeOut { to { opacity:0; transform: translateX(120%); } }
+/* PAGES */
+.page{display:none;animation:pageIn .25s ease}.page.active{display:block}
+@keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-/* ─── NAVBAR ─── */
-nav {
-  background: var(--ink);
-  padding: 0 32px;
-  display: flex; align-items: center; justify-content: space-between;
-  height: 64px;
-  position: sticky; top: 0; z-index: 500;
-  box-shadow: 0 2px 20px rgba(0,0,0,.3);
-}
-.nav-brand {
-  font-family: 'Playfair Display', serif;
-  font-size: 22px; font-weight: 900; color: var(--gold);
-  letter-spacing: 1px; cursor: pointer;
-  display: flex; align-items: center; gap: 8px;
-}
-.nav-brand span { font-style: italic; color: var(--gold-light); }
-.nav-search {
-  display: flex; align-items: center;
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.15);
-  border-radius: 40px; padding: 6px 16px;
-  gap: 8px; flex: 1; max-width: 420px; margin: 0 24px;
-}
-.nav-search input {
-  background: none; border: none; outline: none;
-  color: var(--paper); font-family: 'DM Sans', sans-serif;
-  font-size: 14px; flex: 1;
-}
-.nav-search input::placeholder { color: rgba(255,255,255,.4); }
-.nav-search svg { color: rgba(255,255,255,.4); flex-shrink:0; }
-.nav-actions { display: flex; align-items: center; gap: 8px; }
-.nav-btn {
-  background: none; border: none; cursor: pointer;
-  color: var(--paper); padding: 8px 14px;
-  border-radius: 8px; font-family: 'DM Sans', sans-serif;
-  font-size: 13px; font-weight: 500; letter-spacing: .3px;
-  display: flex; align-items: center; gap: 6px;
-  transition: all .2s;
-}
-.nav-btn:hover { background: rgba(255,255,255,.1); }
-.nav-btn.active { background: var(--gold); color: var(--ink); }
-.cart-badge {
-  background: var(--rust); color: white;
-  font-size: 10px; font-weight: 700;
-  width: 18px; height: 18px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-}
+/* HERO */
+.hero{background:linear-gradient(135deg,#0d0d0d 0%,#1a1205 50%,#0d0d0d 100%);padding:80px 32px 60px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 60%,rgba(232,164,48,.07) 0%,transparent 70%);pointer-events:none}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(232,164,48,.1);border:1px solid rgba(232,164,48,.25);color:var(--amber2);font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:6px 16px;border-radius:40px;margin-bottom:24px}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,6vw,72px);font-weight:700;color:var(--text);line-height:1.08;margin-bottom:18px}
+.hero h1 em{color:var(--amber);font-style:italic}
+.hero p{color:var(--muted);font-size:16px;max-width:480px;margin:0 auto 36px;line-height:1.7}
+.hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
 
-/* ─── PAGES ─── */
-.page { display: none; }
-.page.active { display: block; }
+/* BUTTONS */
+.btn{border:none;border-radius:40px;padding:13px 28px;font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px;transition:all .2s;letter-spacing:.2px}
+.btn-amber{background:var(--amber);color:#000}.btn-amber:hover{background:var(--amber2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,164,48,.3)}
+.btn-outline{background:none;border:1px solid var(--border2);color:var(--text)}.btn-outline:hover{border-color:var(--amber);color:var(--amber)}
+.btn-sm{padding:8px 18px;font-size:13px;border-radius:8px}
+.btn-block{width:100%;justify-content:center;border-radius:var(--radius-sm)}
+.btn-ghost{background:none;border:none;color:var(--muted);padding:6px 10px;font-size:14px;transition:color .15s;border-radius:6px}.btn-ghost:hover{color:var(--red)}
 
-/* ─── HERO ─── */
-.hero {
-  background: linear-gradient(135deg, var(--ink) 0%, #2d1f0e 60%, #1a1208 100%);
-  padding: 72px 40px 56px;
-  text-align: center; position: relative; overflow: hidden;
-}
-.hero::before {
-  content: ''; position: absolute; inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c8963e' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-}
-.hero-tag {
-  display: inline-block; background: rgba(200,150,62,.15);
-  border: 1px solid rgba(200,150,62,.35);
-  color: var(--gold-light); font-size: 11px; font-weight: 600;
-  letter-spacing: 2px; text-transform: uppercase;
-  padding: 6px 16px; border-radius: 40px; margin-bottom: 20px;
-}
-.hero h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(36px, 5vw, 64px); font-weight: 900;
-  color: var(--paper); line-height: 1.1; margin-bottom: 16px;
-}
-.hero h1 em { color: var(--gold); font-style: italic; }
-.hero p { color: rgba(255,255,255,.55); font-size: 16px; max-width: 520px; margin: 0 auto 32px; line-height: 1.65; }
-.hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-.btn-primary {
-  background: var(--gold); color: var(--ink);
-  border: none; border-radius: 40px;
-  padding: 14px 32px; font-family: 'DM Sans', sans-serif;
-  font-size: 14px; font-weight: 700; cursor: pointer;
-  letter-spacing: .4px; transition: all .2s;
-  display: flex; align-items: center; gap: 8px;
-}
-.btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(200,150,62,.35); }
-.btn-ghost {
-  background: none; color: var(--paper);
-  border: 1px solid rgba(255,255,255,.25); border-radius: 40px;
-  padding: 14px 32px; font-family: 'DM Sans', sans-serif;
-  font-size: 14px; font-weight: 500; cursor: pointer;
-  letter-spacing: .4px; transition: all .2s;
-}
-.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+/* CATEGORY BAR */
+.cat-bar{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:2px;padding:0 24px;overflow-x:auto;scrollbar-width:none}
+.cat-bar::-webkit-scrollbar{display:none}
+.cat-chip{background:none;border:none;color:var(--muted);padding:14px 16px;font-size:13px;font-weight:500;white-space:nowrap;border-bottom:2px solid transparent;transition:all .18s;flex-shrink:0}
+.cat-chip:hover{color:var(--text)}.cat-chip.active{color:var(--amber);border-bottom-color:var(--amber)}
 
-/* ─── CATEGORY BAR ─── */
-.cat-bar {
-  background: var(--white); border-bottom: 1px solid var(--border);
-  padding: 0 32px;
-  display: flex; gap: 4px; overflow-x: auto;
-  scrollbar-width: none;
-}
-.cat-bar::-webkit-scrollbar { display: none; }
-.cat-pill {
-  background: none; border: none; cursor: pointer;
-  padding: 14px 18px; font-family: 'DM Sans', sans-serif;
-  font-size: 13px; font-weight: 500; color: var(--muted);
-  white-space: nowrap; border-bottom: 2px solid transparent;
-  transition: all .2s; flex-shrink: 0;
-}
-.cat-pill:hover { color: var(--ink); }
-.cat-pill.active { color: var(--gold); border-bottom-color: var(--gold); font-weight: 600; }
+/* SECTION */
+.section{padding:36px 28px}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--text)}
+.sec-count{font-size:13px;color:var(--muted);margin-left:10px;font-weight:400}
 
-/* ─── SECTION HEADERS ─── */
-.section { padding: 40px 32px; }
-.section-head {
-  display: flex; align-items: baseline; justify-content: space-between;
-  margin-bottom: 24px;
-}
-.section-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 24px; font-weight: 700; color: var(--ink);
-}
-.section-sub { font-size: 13px; color: var(--gold); font-weight: 600; cursor: pointer; }
-.section-sub:hover { text-decoration: underline; }
+/* BOOK GRID */
+.book-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:20px}
+.book-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .22s;position:relative}
+.book-card:hover{border-color:var(--border2);transform:translateY(-5px);box-shadow:0 16px 40px rgba(0,0,0,.6)}
+.cover{width:100%;aspect-ratio:3/4;display:flex;align-items:flex-end;justify-content:flex-start;padding:14px;font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:700;color:rgba(255,255,255,.9);line-height:1.25;position:relative;overflow:hidden}
+.cover::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,rgba(0,0,0,.1) 50%,transparent 100%)}
+.cover-title{position:relative;z-index:1;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+.cover-spine{position:absolute;left:0;top:0;bottom:0;width:10px;background:rgba(0,0,0,.35)}
+.badge{position:absolute;top:10px;right:10px;z-index:2;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 8px;border-radius:4px}
+.badge-hot{background:#c0392b;color:#fff}.badge-new{background:#27ae60;color:#fff}.badge-sale{background:var(--amber);color:#000}
+.oos-overlay{position:absolute;inset:0;background:rgba(0,0,0,.65);z-index:3;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.6)}
+.book-body{padding:13px 13px 10px}
+.book-title{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.book-author{font-size:11.5px;color:var(--muted);margin-bottom:6px}
+.book-desc{font-size:11.5px;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:8px}
+.book-price-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.price{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:500;color:var(--text)}
+.price-orig{font-size:11px;color:var(--muted);text-decoration:line-through;font-family:'JetBrains Mono',monospace}
+.stars-row{display:flex;align-items:center;gap:3px;margin-bottom:5px}
+.stars span{font-size:11px;color:var(--amber)}.stars span.dim{color:var(--muted2)}
+.rating-ct{font-size:10.5px;color:var(--muted);margin-left:3px}
+.members-txt{font-size:10.5px;color:var(--green);font-weight:500;margin-bottom:4px}
+.delivery-txt{font-size:10.5px;color:var(--muted);margin-bottom:10px}.delivery-txt b{color:var(--amber2)}
+.shared-txt{font-size:10px;color:var(--muted2);border-top:1px solid var(--border);padding:7px 13px;display:flex;align-items:center;gap:5px}
+.add-btn{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:9px;font-size:12px;font-weight:600;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:6px}
+.add-btn:hover{background:var(--amber);border-color:var(--amber);color:#000}.add-btn.in-cart{background:rgba(61,153,112,.15);border-color:var(--green);color:var(--green)}
+.add-btn:disabled{opacity:.45;cursor:not-allowed}.add-btn:disabled:hover{background:var(--surface);border-color:var(--border);color:var(--text)}
+.no-results{grid-column:1/-1;text-align:center;padding:64px 24px}
+.no-results .nr-icon{font-size:52px;margin-bottom:16px}
+.no-results h3{font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:8px}
+.no-results p{color:var(--muted);font-size:14px}
 
-/* ─── BOOK GRID ─── */
-.book-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 24px;
-}
-.book-card {
-  background: var(--white); border-radius: var(--radius);
-  overflow: hidden; cursor: pointer;
-  box-shadow: var(--shadow); transition: all .25s;
-  position: relative;
-}
-.book-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
-.book-cover {
-  width: 100%; aspect-ratio: 3/4;
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Playfair Display', serif;
-  font-size: 15px; font-weight: 700;
-  text-align: center; padding: 20px;
-  position: relative; overflow: hidden;
-  color: white; line-height: 1.3;
-}
-.book-cover::after {
-  content: ''; position: absolute; top: 0; left: 0;
-  width: 8px; height: 100%;
-  background: rgba(0,0,0,.25);
-}
-.badge-new, .badge-hot, .badge-sale {
-  position: absolute; top: 10px; right: 10px;
-  font-size: 9px; font-weight: 700; letter-spacing: 1px;
-  text-transform: uppercase; padding: 4px 8px; border-radius: 4px;
-}
-.badge-new { background: var(--sage); color: white; }
-.badge-hot { background: var(--rust); color: white; }
-.badge-sale { background: var(--gold); color: var(--ink); }
-.unavailable-overlay {
-  position: absolute; inset: 0; background: rgba(0,0,0,.55);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 700; color: white;
-  letter-spacing: 1px;
-}
-.book-info { padding: 14px 14px 12px; }
-.book-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 14px; font-weight: 700; color: var(--ink);
-  margin-bottom: 2px; line-height: 1.35;
-  display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
-}
-.book-desc {
-  font-size: 11px; color: var(--muted); line-height: 1.5;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-  margin-bottom: 8px;
-}
-.book-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-.book-price { font-family: 'DM Mono', monospace; font-size: 16px; font-weight: 500; color: var(--ink); }
-.book-price .original { font-size: 11px; color: var(--muted); text-decoration: line-through; margin-left: 4px; }
-.stars { display: flex; gap: 2px; font-size: 11px; }
-.star { color: var(--gold); }
-.star.empty { color: var(--border); }
-.rating-count { font-size: 10px; color: var(--muted); margin-left: 3px; }
-.members-bought { font-size: 10px; color: var(--sage); font-weight: 600; margin-bottom: 8px; }
-.delivery-date { font-size: 10px; color: var(--muted); margin-bottom: 10px; }
-.delivery-date b { color: var(--sage); }
-.add-to-cart {
-  width: 100%; background: var(--ink); color: var(--paper);
-  border: none; border-radius: var(--radius-sm); padding: 9px;
-  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
-  cursor: pointer; letter-spacing: .3px; transition: all .2s;
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-}
-.add-to-cart:hover { background: var(--gold); color: var(--ink); }
-.add-to-cart.in-cart { background: var(--sage); color: white; }
-.shared-viewed {
-  font-size: 10px; color: var(--muted);
-  padding: 6px 14px; border-top: 1px solid var(--border);
-  display: flex; align-items: center; gap: 4px;
-}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:900;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);max-width:580px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow);animation:modalIn .25s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(20px)}to{opacity:1;transform:none}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--card);z-index:1}
+.modal-head h3{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:700}
+.modal-close{background:none;border:none;color:var(--muted);font-size:20px;line-height:1;padding:4px;border-radius:6px;transition:color .15s}.modal-close:hover{color:var(--red)}
+.modal-body{padding:22px}
+.modal-cover{width:100%;height:200px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:rgba(255,255,255,.9);text-align:center;padding:20px;margin-bottom:20px;position:relative;overflow:hidden;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+.modal-cover::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,.2),rgba(0,0,0,.4))}
+.modal-cover span{position:relative;z-index:1}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.detail-item label{display:block;font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.detail-item span{font-size:13.5px;font-weight:500}.detail-item.full{grid-column:1/-1}
+.info-banner{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:10px;display:flex;gap:10px;align-items:flex-start}
+.divider{border:none;border-top:1px solid var(--border);margin:20px 0}
+.rating-row{display:flex;gap:6px;margin:10px 0 8px}
+.r-star-btn{background:none;border:none;font-size:24px;transition:transform .1s;padding:0}.r-star-btn:hover{transform:scale(1.2)}
+.review-textarea{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:10px 13px;font-size:13px;outline:none;resize:vertical;min-height:80px;transition:border .2s;margin-bottom:10px}
+.review-textarea:focus{border-color:var(--amber)}
+.review-textarea::placeholder{color:var(--muted2)}
+.reviews-list{margin-top:14px;display:flex;flex-direction:column;gap:10px}
+.rev-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px}
+.rev-meta{display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:11px;color:var(--muted)}
+.rev-text{font-size:13px;line-height:1.55}
 
-/* ─── CART PAGE ─── */
-.cart-layout { display: grid; grid-template-columns: 1fr 340px; gap: 32px; padding: 32px; max-width: 1100px; margin: 0 auto; }
-@media(max-width:768px) { .cart-layout { grid-template-columns: 1fr; } }
-.cart-table { background: var(--white); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
-.cart-header { background: var(--cream); padding: 16px 20px; font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; border-bottom: 1px solid var(--border); }
-.cart-item { display: flex; align-items: center; gap: 16px; padding: 16px 20px; border-bottom: 1px solid var(--border); }
-.cart-item:last-child { border-bottom: none; }
-.cart-cover { width: 48px; height: 64px; border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 8px; font-weight: 700; color: white; text-align: center; padding: 4px; }
-.cart-item-name { flex: 1; }
-.cart-item-name b { font-size: 14px; display: block; margin-bottom: 2px; }
-.cart-item-name span { font-size: 12px; color: var(--muted); }
-.qty-ctrl { display: flex; align-items: center; gap: 8px; }
-.qty-btn { width: 28px; height: 28px; border: 1px solid var(--border); border-radius: 6px; background: none; cursor: pointer; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; transition: all .15s; }
-.qty-btn:hover { background: var(--cream); }
-.qty-val { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; min-width: 20px; text-align: center; }
-.cart-item-price { font-family: 'DM Mono', monospace; font-weight: 600; font-size: 15px; min-width: 70px; text-align: right; }
-.remove-btn { background: none; border: none; cursor: pointer; color: var(--muted); padding: 4px; border-radius: 4px; transition: all .15s; }
-.remove-btn:hover { color: var(--rust); background: #fef2f0; }
-.cart-summary { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; height: fit-content; }
-.cart-summary h3 { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; margin-bottom: 20px; }
-.summary-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; }
-.summary-row.total { font-weight: 700; font-size: 16px; border-top: 1px solid var(--border); padding-top: 12px; margin-top: 4px; }
-.checkout-form { margin-top: 20px; }
-.form-group { margin-bottom: 14px; }
-.form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 5px; letter-spacing: .5px; text-transform: uppercase; }
-.form-group input, .form-group select {
-  width: 100%; padding: 10px 14px;
-  border: 1px solid var(--border); border-radius: var(--radius-sm);
-  font-family: 'DM Sans', sans-serif; font-size: 14px;
-  background: var(--paper); outline: none; transition: border .2s;
-}
-.form-group input:focus, .form-group select:focus { border-color: var(--gold); }
-.checkout-btn {
-  width: 100%; background: var(--gold); color: var(--ink);
-  border: none; border-radius: 40px; padding: 14px;
-  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
-  cursor: pointer; letter-spacing: .4px; transition: all .2s; margin-top: 8px;
-}
-.checkout-btn:hover { background: var(--gold-light); }
-.return-policy {
-  display: flex; align-items: flex-start; gap: 8px;
-  background: #f0f8f1; border: 1px solid #c3e6cc; border-radius: var(--radius-sm);
-  padding: 12px; font-size: 12px; color: var(--sage); margin-top: 14px; line-height: 1.5;
-}
+/* CART */
+.cart-layout{display:grid;grid-template-columns:1fr 340px;gap:28px;padding:32px 28px;max-width:1100px;margin:0 auto}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.panel-head{padding:16px 20px;border-bottom:1px solid var(--border);font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700}
+.cart-row{display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid var(--border);transition:background .15s}
+.cart-row:last-child{border-bottom:none}.cart-row:hover{background:rgba(255,255,255,.02)}
+.cart-mini-cover{width:44px;height:58px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:7px;font-family:'Cormorant Garamond',serif;font-weight:700;color:rgba(255,255,255,.8);text-align:center;padding:4px;overflow:hidden}
+.cart-info{flex:1;min-width:0}.cart-info b{display:block;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cart-info span{font-size:11.5px;color:var(--muted)}
+.qty-ctrl{display:flex;align-items:center;gap:6px}
+.qty-btn{width:28px;height:28px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:15px;font-weight:700;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.qty-btn:hover{border-color:var(--amber);color:var(--amber)}
+.qty-val{font-family:'JetBrains Mono',monospace;font-size:13px;min-width:22px;text-align:center}
+.cart-price{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;min-width:68px;text-align:right}
+.summary-panel{padding:20px}
+.summary-panel h3{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;margin-bottom:18px}
+.sum-row{display:flex;justify-content:space-between;margin-bottom:10px;font-size:13.5px}
+.sum-row.total{font-weight:700;font-size:16px;color:var(--amber);border-top:1px solid var(--border);padding-top:12px;margin-top:6px}
+.form-group{margin-bottom:13px}
+.form-group label{display:block;font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.form-group input,.form-group select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:10px 13px;font-size:13.5px;outline:none;transition:border .2s}
+.form-group input:focus,.form-group select:focus{border-color:var(--amber)}
+.form-group input::placeholder{color:var(--muted2)}
+.return-banner{display:flex;gap:8px;align-items:flex-start;background:rgba(61,153,112,.08);border:1px solid rgba(61,153,112,.25);border-radius:var(--radius-sm);padding:11px 13px;font-size:12px;color:var(--green);line-height:1.55;margin-top:12px}
 
-/* ─── TRACK ORDER PAGE ─── */
-.track-wrapper { max-width: 700px; margin: 48px auto; padding: 0 24px; }
-.track-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 32px; }
-.track-card h2 { font-family: 'Playfair Display', serif; font-size: 26px; margin-bottom: 8px; }
-.track-card p { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
-.track-form { display: flex; gap: 10px; margin-bottom: 28px; }
-.track-input {
-  flex: 1; padding: 12px 16px;
-  border: 1px solid var(--border); border-radius: var(--radius-sm);
-  font-family: 'DM Sans', sans-serif; font-size: 14px;
-  background: var(--paper); outline: none;
-}
-.track-input:focus { border-color: var(--gold); }
-.track-btn {
-  background: var(--ink); color: var(--paper); border: none;
-  border-radius: var(--radius-sm); padding: 12px 24px;
-  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all .2s;
-}
-.track-btn:hover { background: var(--gold); color: var(--ink); }
-.order-result { display: none; }
-.order-result.show { display: block; }
-.order-info { background: var(--cream); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 24px; }
-.order-info h4 { font-family: 'Playfair Display', serif; font-size: 15px; margin-bottom: 10px; }
-.order-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.order-meta-item { font-size: 12px; }
-.order-meta-item label { color: var(--muted); display: block; margin-bottom: 2px; font-weight: 600; font-size: 10px; letter-spacing: .5px; text-transform: uppercase; }
-.track-steps { display: flex; flex-direction: column; gap: 0; }
-.track-step {
-  display: flex; gap: 16px; padding-bottom: 28px; position: relative;
-}
-.track-step:last-child { padding-bottom: 0; }
-.step-indicator { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
-.step-dot {
-  width: 36px; height: 36px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: 700; flex-shrink: 0;
-  border: 2px solid var(--border); background: var(--white); color: var(--muted);
-  transition: all .3s;
-}
-.step-dot.done { background: var(--sage); border-color: var(--sage); color: white; }
-.step-dot.active { background: var(--gold); border-color: var(--gold); color: var(--ink); }
-.step-line { width: 2px; flex: 1; background: var(--border); margin-top: 4px; min-height: 20px; }
-.step-line.done { background: var(--sage); }
-.step-content { padding-top: 6px; }
-.step-name { font-weight: 600; font-size: 14px; color: var(--ink); }
-.step-date { font-size: 12px; color: var(--muted); margin-top: 2px; }
+/* TRACK */
+.track-wrapper{max-width:680px;margin:48px auto;padding:0 24px}
+.track-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px}
+.track-card h2{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;margin-bottom:8px}
+.track-card>p{color:var(--muted);font-size:14px;margin-bottom:24px}
+.input-row{display:flex;gap:10px;margin-bottom:20px}
+.big-input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:12px 15px;font-size:14px;outline:none;transition:border .2s}
+.big-input:focus{border-color:var(--amber)}.big-input::placeholder{color:var(--muted2)}
+.order-block{margin-bottom:28px}.order-block:not(:first-child){padding-top:24px;border-top:1px solid var(--border)}
+.order-header-info{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:20px}
+.order-header-info h4{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:700;margin-bottom:8px}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.meta-item label{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:2px}
+.meta-item span{font-size:13px}
+.stepper{display:flex;flex-direction:column}
+.step{display:flex;gap:16px;padding-bottom:24px}.step:last-child{padding-bottom:0}
+.step-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.step-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;border:2px solid var(--border2);background:var(--surface);color:var(--muted);transition:all .35s;flex-shrink:0}
+.step-dot.done{background:var(--green);border-color:var(--green);color:#fff}.step-dot.current{background:var(--amber);border-color:var(--amber);color:#000}
+.step-line{width:2px;flex:1;background:var(--border);margin-top:4px;min-height:18px}.step-line.done{background:var(--green)}
+.step-content{padding-top:7px}.step-label{font-weight:600;font-size:14px}.step-sub{font-size:12px;color:var(--muted);margin-top:2px}
 
-/* ─── MY ORDERS PAGE ─── */
-.orders-wrapper { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
-.orders-wrapper h2 { font-family: 'Playfair Display', serif; font-size: 28px; margin-bottom: 24px; }
-.order-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 16px; }
-.order-card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-.order-id { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); }
-.order-status-badge { padding: 4px 12px; border-radius: 40px; font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
-.status-ordered { background: #fef3cd; color: #8a6914; }
-.status-packed { background: #dbeafe; color: #1e40af; }
-.status-shipped { background: #e0f2fe; color: #0369a1; }
-.status-delivered { background: #dcfce7; color: #166534; }
-.order-items-list { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
-.order-total-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 10px; }
-.order-total-row b { font-family: 'DM Mono', monospace; font-size: 15px; }
+/* ORDERS */
+.orders-wrapper{max-width:860px;margin:0 auto;padding:36px 24px}
+.orders-wrapper h2{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;margin-bottom:8px}
+.orders-wrapper>p{color:var(--muted);font-size:14px;margin-bottom:24px}
+.email-lookup{display:flex;gap:10px;margin-bottom:28px;max-width:440px}
+.ord-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px;transition:border .2s}
+.ord-card:hover{border-color:var(--border2)}
+.ord-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:12px}
+.ord-id{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);display:block;margin-bottom:3px}
+.ord-date{font-size:12px;color:var(--muted2)}
+.status-pill{padding:4px 12px;border-radius:40px;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+.s-ordered{background:rgba(232,164,48,.15);color:var(--amber)}.s-packed{background:rgba(46,134,222,.12);color:var(--blue)}
+.s-shipped{background:rgba(0,180,216,.1);color:#00b4d8}.s-delivered{background:rgba(61,153,112,.12);color:var(--green)}
+.ord-items{font-size:12.5px;color:var(--muted);margin-bottom:10px;line-height:1.55}
+.ord-bottom{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:10px}
+.ord-total{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;color:var(--amber)}
 
-/* ─── ABOUT PAGE ─── */
-.about-wrapper { max-width: 900px; margin: 0 auto; padding: 48px 32px; }
-.about-hero { display: grid; grid-template-columns: auto 1fr; gap: 40px; align-items: start; margin-bottom: 48px; }
-@media(max-width:600px) { .about-hero { grid-template-columns: 1fr; } }
-.author-avatar {
-  width: 160px; height: 160px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--gold) 0%, var(--rust) 100%);
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 900; color: white;
-  flex-shrink: 0; box-shadow: var(--shadow-lg);
-}
-.author-intro h1 { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 900; margin-bottom: 6px; }
-.author-intro .subtitle { color: var(--gold); font-size: 14px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
-.author-intro p { color: var(--muted); font-size: 15px; line-height: 1.7; }
-.about-section { margin-bottom: 36px; }
-.about-section h3 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 2px solid var(--cream); }
-.skill-pills { display: flex; flex-wrap: wrap; gap: 8px; }
-.skill-pill { background: var(--cream); border: 1px solid var(--border); border-radius: 40px; padding: 6px 14px; font-size: 12px; font-weight: 500; color: var(--ink); }
-.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; }
-.stat-item { background: var(--cream); border-radius: var(--radius-sm); padding: 16px; text-align: center; }
-.stat-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900; color: var(--gold); }
-.stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
-.about-p { font-size: 15px; color: var(--muted); line-height: 1.75; }
+/* ABOUT */
+.about-wrapper{max-width:840px;margin:0 auto;padding:48px 28px}
+.about-hero{display:grid;grid-template-columns:auto 1fr;gap:36px;align-items:start;margin-bottom:48px}
+.avatar{width:148px;height:148px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--amber) 0%,#c0472b 100%);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:54px;font-weight:700;color:#fff;box-shadow:0 0 0 4px rgba(232,164,48,.2),var(--shadow)}
+.author-name{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:700;line-height:1.1;margin-bottom:6px}
+.author-role{color:var(--amber);font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px}
+.author-bio{color:var(--muted);font-size:15px;line-height:1.75}
+.about-sec{margin-bottom:36px}.about-sec h3{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:700;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.skill-wrap{display:flex;flex-wrap:wrap;gap:8px}
+.skill-tag{background:var(--surface);border:1px solid var(--border2);border-radius:40px;padding:6px 14px;font-size:12.5px;font-weight:500;transition:all .15s}
+.skill-tag:hover{border-color:var(--amber);color:var(--amber)}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px}
+.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;text-align:center}
+.stat-n{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:var(--amber)}.stat-l{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.4}
+.about-text{font-size:15px;color:var(--muted);line-height:1.8}
+.contact-chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.contact-chip{display:inline-flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:9px 14px;font-size:13px;transition:all .15s;color:var(--text);text-decoration:none}
+.contact-chip:hover{border-color:var(--amber);color:var(--amber)}
 
-/* ─── MODAL ─── */
-.modal-bg {
-  position: fixed; inset: 0; background: rgba(0,0,0,.6);
-  z-index: 800; display: none; align-items: center; justify-content: center;
-  padding: 24px;
-}
-.modal-bg.open { display: flex; }
-.modal {
-  background: var(--white); border-radius: var(--radius);
-  max-width: 600px; width: 100%; max-height: 90vh;
-  overflow-y: auto; box-shadow: var(--shadow-lg);
-  animation: modalIn .25s ease;
-}
-@keyframes modalIn { from { transform: scale(.95) translateY(16px); opacity:0; } to { transform: scale(1) translateY(0); opacity:1; } }
-.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--border); }
-.modal-header h3 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; }
-.modal-close { background: none; border: none; cursor: pointer; font-size: 20px; color: var(--muted); padding: 4px; border-radius: 4px; }
-.modal-close:hover { color: var(--rust); }
-.modal-body { padding: 24px; }
-.modal-cover { width: 100%; aspect-ratio: 3/1.4; border-radius: var(--radius-sm); margin-bottom: 20px; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: white; text-align: center; padding: 20px; }
-.modal-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-.modal-detail-item label { font-size: 10px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 4px; }
-.modal-detail-item span { font-size: 14px; font-weight: 500; }
-.rating-input { display: flex; gap: 4px; margin-top: 8px; }
-.rating-star-btn { background: none; border: none; cursor: pointer; font-size: 22px; transition: transform .1s; }
-.rating-star-btn:hover { transform: scale(1.2); }
-.review-textarea {
-  width: 100%; border: 1px solid var(--border); border-radius: var(--radius-sm);
-  padding: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px;
-  background: var(--paper); outline: none; resize: vertical; min-height: 80px;
-  margin-top: 10px;
-}
-.submit-review-btn {
-  background: var(--gold); color: var(--ink); border: none;
-  border-radius: var(--radius-sm); padding: 10px 20px;
-  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700;
-  cursor: pointer; margin-top: 10px; transition: all .2s;
-}
-.submit-review-btn:hover { background: var(--gold-light); }
-.reviews-list { margin-top: 12px; }
-.review-item { background: var(--cream); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 8px; }
-.review-item .reviewer { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
-.review-item .review-text { font-size: 13px; color: var(--muted); line-height: 1.5; }
+/* EMPTY */
+.empty{text-align:center;padding:60px 20px}.empty .ei{font-size:52px;margin-bottom:14px}
+.empty h3{font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:8px}.empty p{color:var(--muted);font-size:14px}
 
-/* ─── EMPTY STATE ─── */
-.empty-state { text-align: center; padding: 64px 24px; }
-.empty-state .icon { font-size: 56px; margin-bottom: 16px; }
-.empty-state h3 { font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 8px; }
-.empty-state p { color: var(--muted); font-size: 14px; }
-
-/* ─── RESPONSIVE ─── */
-@media(max-width:640px) {
-  nav { padding: 0 16px; }
-  .nav-search { display: none; }
-  .section { padding: 24px 16px; }
-  .book-grid { grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 14px; }
+@media(max-width:780px){.cart-layout{grid-template-columns:1fr}}
+@media(max-width:600px){
+  #navbar{padding:0 12px;gap:6px}.search-wrap{max-width:unset;margin:0 6px}
+  .nav-btn .nav-label{display:none}.nav-btn{padding:8px 9px}
+  .section{padding:20px 14px}.book-grid{grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px}
+  .hero{padding:52px 18px 40px}.cart-layout{padding:20px 14px}
+  .about-hero{grid-template-columns:1fr;text-align:center}.avatar{margin:0 auto}
 }
 </style>
 </head>
 <body>
 
-<!-- TOAST CONTAINER -->
-<div id="toast"></div>
+<div id="toastZone"></div>
 
 <!-- NAVBAR -->
-<nav>
-  <div class="nav-brand" onclick="showPage('home')">📖 Page<span>Turner</span></div>
-  <div class="nav-search">
-    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-    <input type="text" id="searchInput" placeholder="Search books, genres, authors…" oninput="handleSearch()">
+<nav id="navbar">
+  <div class="brand" onclick="goPage('home')">📚 Folio<em>verse</em></div>
+  <div class="search-wrap">
+    <svg class="search-icon" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input id="searchInput" type="text" placeholder="Search books, authors, genres…"
+      oninput="onSearch(this.value)" onkeydown="if(event.key==='Escape')clearSearch()">
+    <button class="search-clear" id="searchClear" onclick="clearSearch()" title="Clear search">✕</button>
   </div>
-  <div class="nav-actions">
-    <button class="nav-btn" onclick="showPage('home')">🏠 Home</button>
-    <button class="nav-btn" onclick="showPage('track')">📦 Track</button>
-    <button class="nav-btn" onclick="showPage('orders')">🧾 My Orders</button>
-    <button class="nav-btn" onclick="showPage('about')">👩‍💻 Author</button>
-    <button class="nav-btn" onclick="showPage('cart')" id="cartBtn">
-      🛒 Cart <span class="cart-badge" id="cartBadge">0</span>
+  <div class="nav-links">
+    <button class="nav-btn active" id="nb-home"   onclick="goPage('home')">  <span>🏠</span><span class="nav-label">Home</span></button>
+    <button class="nav-btn"        id="nb-track"  onclick="goPage('track')"> <span>📦</span><span class="nav-label">Track</span></button>
+    <button class="nav-btn"        id="nb-orders" onclick="goPage('orders')"><span>🧾</span><span class="nav-label">My Orders</span></button>
+    <button class="nav-btn"        id="nb-about"  onclick="goPage('about')"> <span>👩‍💻</span><span class="nav-label">Author</span></button>
+    <button class="nav-btn"        id="nb-cart"   onclick="goPage('cart')">
+      <span>🛒</span><span class="nav-label">Cart</span>
+      <span class="cart-count" id="cartCount">0</span>
     </button>
   </div>
 </nav>
 
-<!-- HOME PAGE -->
-<div class="page active" id="page-home">
+<!-- ══════════ HOME ══════════ -->
+<div class="page active" id="pg-home">
   <div class="hero">
-    <div class="hero-tag">✨ Curated Reads · Free Shipping over ₹499</div>
-    <h1>Find Your Next<br><em>Great Read</em></h1>
-    <p>Thousands of books across every genre — from heart-pounding thrillers to soul-stirring romances. Delivered to your door.</p>
-    <div class="hero-cta">
-      <button class="btn-primary" onclick="document.querySelector('.section').scrollIntoView({behavior:'smooth'})">Browse Books →</button>
-      <button class="btn-ghost" onclick="showPage('about')">About the Author</button>
+    <div class="hero-eyebrow">✨ Curated Reads · Free Delivery above ₹499</div>
+    <h1>Find Your Next<br><em>Great Story</em></h1>
+    <p>Thousands of books across every mood — from bone-chilling horror to heart-warming romance. Delivered right to your door.</p>
+    <div class="hero-actions">
+      <button class="btn btn-amber" onclick="scrollToBooks()">Browse Books →</button>
+      <button class="btn btn-outline" onclick="goPage('about')">Meet the Author</button>
     </div>
   </div>
 
-  <!-- CATEGORY BAR -->
   <div class="cat-bar" id="catBar">
-    <button class="cat-pill active" onclick="filterCategory('all',this)">All Books</button>
-    <button class="cat-pill" onclick="filterCategory('romantic',this)">💕 Romantic</button>
-    <button class="cat-pill" onclick="filterCategory('horror',this)">👻 Horror</button>
-    <button class="cat-pill" onclick="filterCategory('mystery',this)">🔍 Mystery</button>
-    <button class="cat-pill" onclick="filterCategory('fantasy',this)">🧙 Fantasy</button>
-    <button class="cat-pill" onclick="filterCategory('self-help',this)">🌱 Self-Help</button>
-    <button class="cat-pill" onclick="filterCategory('sci-fi',this)">🚀 Sci-Fi</button>
-    <button class="cat-pill" onclick="filterCategory('biography',this)">📜 Biography</button>
-    <button class="cat-pill" onclick="filterCategory('classics',this)">🏛️ Classics</button>
+    <button class="cat-chip active" onclick="setCategory('all',this)">All Books</button>
+    <button class="cat-chip" onclick="setCategory('romantic',this)">💕 Romantic</button>
+    <button class="cat-chip" onclick="setCategory('horror',this)">👻 Horror</button>
+    <button class="cat-chip" onclick="setCategory('mystery',this)">🔍 Mystery</button>
+    <button class="cat-chip" onclick="setCategory('fantasy',this)">🧙 Fantasy</button>
+    <button class="cat-chip" onclick="setCategory('self-help',this)">🌱 Self-Help</button>
+    <button class="cat-chip" onclick="setCategory('sci-fi',this)">🚀 Sci-Fi</button>
+    <button class="cat-chip" onclick="setCategory('biography',this)">📜 Biography</button>
+    <button class="cat-chip" onclick="setCategory('classics',this)">🏛️ Classics</button>
   </div>
 
-  <!-- BOOKS SECTION -->
-  <div class="section">
-    <div class="section-head">
-      <div class="section-title" id="sectionTitle">Featured Books</div>
-      <span class="section-sub" id="bookCount"></span>
+  <div class="section" id="booksSection">
+    <div class="sec-head">
+      <div>
+        <span class="sec-title" id="secTitle">Featured Books</span>
+        <span class="sec-count" id="secCount"></span>
+      </div>
     </div>
     <div class="book-grid" id="bookGrid"></div>
   </div>
 </div>
 
-<!-- CART PAGE -->
-<div class="page" id="page-cart">
+<!-- ══════════ CART ══════════ -->
+<div class="page" id="pg-cart">
   <div class="cart-layout">
     <div>
-      <div class="cart-table">
-        <div class="cart-header">🛒 Your Shopping Cart</div>
+      <div class="panel">
+        <div class="panel-head">🛒 Shopping Cart</div>
         <div id="cartItems"></div>
       </div>
     </div>
     <div>
-      <div class="cart-summary">
-        <h3>Order Summary</h3>
-        <div class="summary-row"><span>Subtotal</span><span id="subtotal">₹0</span></div>
-        <div class="summary-row"><span>Shipping</span><span id="shipping">₹40</span></div>
-        <div class="summary-row"><span>Discount</span><span id="discount" style="color:var(--sage)">-₹0</span></div>
-        <div class="summary-row total"><span>Total</span><span id="total">₹0</span></div>
-
-        <div class="checkout-form">
-          <div class="form-group">
-            <label>Email ID</label>
-            <input type="email" id="checkoutEmail" placeholder="you@example.com">
-          </div>
-          <div class="form-group">
-            <label>Full Name</label>
-            <input type="text" id="checkoutName" placeholder="Your name">
-          </div>
-          <div class="form-group">
-            <label>Delivery City</label>
-            <input type="text" id="checkoutCity" placeholder="Chennai, Mumbai…">
-          </div>
-          <div class="form-group">
-            <label>State</label>
-            <input type="text" id="checkoutState" placeholder="Tamil Nadu">
-          </div>
-          <button class="checkout-btn" onclick="placeOrder()">Place Order →</button>
-          <div class="return-policy">
-            <span>↩</span>
-            <span><b>Free Returns within 7 days.</b> No questions asked. Damaged or wrong items? Full refund guaranteed.</span>
+      <div class="panel">
+        <div class="summary-panel">
+          <h3>Order Summary</h3>
+          <div class="sum-row"><span>Subtotal</span><span id="sumSub">₹0</span></div>
+          <div class="sum-row"><span>Shipping</span><span id="sumShip">₹40</span></div>
+          <div class="sum-row"><span style="color:var(--green)">You save</span><span id="sumSave" style="color:var(--green)">₹0</span></div>
+          <div class="sum-row total"><span>Total</span><span id="sumTotal">₹0</span></div>
+          <div style="margin-top:20px">
+            <div class="form-group"><label>Email ID *</label><input type="email" id="coEmail" placeholder="you@example.com"></div>
+            <div class="form-group"><label>Full Name *</label><input type="text" id="coName" placeholder="Your full name"></div>
+            <div class="form-group"><label>Delivery City *</label><input type="text" id="coCity" placeholder="Chennai, Mumbai…"></div>
+            <div class="form-group"><label>State</label><input type="text" id="coState" placeholder="Tamil Nadu"></div>
+            <button class="btn btn-amber btn-block" style="margin-top:4px" onclick="placeOrder()">Place Order →</button>
+            <div class="return-banner">↩ <span><strong>Free Returns within 7 days.</strong> Damaged or wrong item? Full refund, no questions asked.</span></div>
           </div>
         </div>
       </div>
@@ -545,459 +322,525 @@ nav {
   </div>
 </div>
 
-<!-- TRACK PAGE -->
-<div class="page" id="page-track">
+<!-- ══════════ TRACK ══════════ -->
+<div class="page" id="pg-track">
   <div class="track-wrapper">
     <div class="track-card">
       <h2>Track Your Order</h2>
-      <p>Enter your email address to see all your orders and their current status.</p>
-      <div class="track-form">
-        <input class="track-input" id="trackEmail" type="email" placeholder="Enter your email…">
-        <button class="track-btn" onclick="trackOrder()">Track →</button>
+      <p>Enter the email you used when placing your order to see real-time status updates.</p>
+      <div class="input-row">
+        <input class="big-input" id="trackEmail" type="email" placeholder="Enter your email address…" onkeydown="if(event.key==='Enter')doTrack()">
+        <button class="btn btn-amber" onclick="doTrack()">Track →</button>
       </div>
-      <div class="order-result" id="trackResult"></div>
+      <div id="trackResults"></div>
     </div>
   </div>
 </div>
 
-<!-- MY ORDERS PAGE -->
-<div class="page" id="page-orders">
+<!-- ══════════ MY ORDERS ══════════ -->
+<div class="page" id="pg-orders">
   <div class="orders-wrapper">
-    <h2>📦 My Orders</h2>
-    <div id="ordersEmail" style="margin-bottom:16px;">
-      <div class="form-group" style="max-width:360px;margin-bottom:12px;">
-        <label>Enter your email to view orders</label>
-        <div style="display:flex;gap:10px;">
-          <input type="email" id="ordersEmailInput" class="track-input" placeholder="you@example.com" style="flex:1;">
-          <button class="track-btn" onclick="loadOrders()">Load →</button>
-        </div>
-      </div>
+    <h2>My Orders</h2>
+    <p>View all your past orders and current delivery status.</p>
+    <div class="email-lookup">
+      <input class="big-input" id="ordEmail" type="email" placeholder="Enter your email…" onkeydown="if(event.key==='Enter')loadOrders()">
+      <button class="btn btn-amber" onclick="loadOrders()">Load Orders →</button>
     </div>
     <div id="ordersList"></div>
   </div>
 </div>
 
-<!-- ABOUT PAGE -->
-<div class="page" id="page-about">
+<!-- ══════════ ABOUT ══════════ -->
+<div class="page" id="pg-about">
   <div class="about-wrapper">
     <div class="about-hero">
-      <div class="author-avatar">N</div>
-      <div class="author-intro">
-        <h1>Nivetha S</h1>
-        <div class="subtitle">💻 Computer Science Student · Aspiring Full-Stack Developer</div>
-        <p>A passionate Computer Science student at <b>National Engineering College</b> and an aspiring Software Developer with a strong interest in Full-Stack Development and Application Design. I enjoy building efficient, user-friendly solutions that bridge complex logic with seamless experiences.</p>
+      <div class="avatar">N</div>
+      <div>
+        <div class="author-name">Nivetha S</div>
+        <div class="author-role">💻 CS Student · Aspiring Software Developer</div>
+        <p class="author-bio">
+          A first-year Computer Science student at <strong style="color:var(--text)">National Engineering College</strong> with a strong interest in software development and problem-solving. Currently building a solid foundation in programming through languages like C, C++, and Python — with eyes firmly set on becoming a full-stack developer.
+        </p>
       </div>
     </div>
 
-    <div class="about-section">
+    <div class="about-sec">
       <h3>🛠️ Technical Skills</h3>
-      <div class="skill-pills">
-        <span class="skill-pill">C</span><span class="skill-pill">Java</span>
-        <span class="skill-pill">Python</span><span class="skill-pill">C++</span>
-        <span class="skill-pill">HTML</span><span class="skill-pill">CSS</span>
-        <span class="skill-pill">JavaScript</span><span class="skill-pill">React.js</span>
-        <span class="skill-pill">Full-Stack Development</span>
-        <span class="skill-pill">Application Design</span>
-        <span class="skill-pill">SDLC</span>
+      <div class="skill-wrap">
+        <span class="skill-tag">C</span><span class="skill-tag">C++</span><span class="skill-tag">Python</span>
+        <span class="skill-tag">HTML</span><span class="skill-tag">CSS</span><span class="skill-tag">JavaScript</span>
+        <span class="skill-tag">Web Development</span><span class="skill-tag">Application Design</span>
+        <span class="skill-tag">Problem Solving</span><span class="skill-tag">Logical Thinking</span>
+        <span class="skill-tag">Data Structures</span><span class="skill-tag">Algorithms</span>
       </div>
     </div>
 
-    <div class="about-section">
+    <div class="about-sec">
       <h3>📊 At a Glance</h3>
-      <div class="stat-grid">
-        <div class="stat-item"><div class="stat-num">200+</div><div class="stat-label">Problems Solved on LeetCode & HackerRank</div></div>
-        <div class="stat-item"><div class="stat-num">NEC</div><div class="stat-label">National Engineering College</div></div>
-        <div class="stat-item"><div class="stat-num">GitHub</div><div class="stat-label">Active Open-Source Contributor</div></div>
-        <div class="stat-item"><div class="stat-num">FS Dev</div><div class="stat-label">Full-Stack Development Focus</div></div>
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-n">600+</div><div class="stat-l">Problems Solved on Skillrack</div></div>
+        <div class="stat-box"><div class="stat-n">NEC</div><div class="stat-l">National Engineering College</div></div>
+        <div class="stat-box"><div class="stat-n">CS</div><div class="stat-l">First-Year Computer Science</div></div>
+        <div class="stat-box"><div class="stat-n">FS</div><div class="stat-l">Full-Stack Development Goal</div></div>
       </div>
     </div>
 
-    <div class="about-section">
-      <h3>🌟 About Me</h3>
-      <p class="about-p">I have a solid foundation in C, Java, Python, and C++, along with web technologies like HTML, CSS, JavaScript, and React.js. I have solved over 200 problems on platforms like LeetCode and HackerRank, strengthening my problem-solving and algorithmic skills. I have also developed and deployed a personal portfolio website using modern frameworks.</p>
-      <br>
-      <p class="about-p">Beyond coding, I actively contribute to open-source projects on GitHub and have experience organizing coding events and mentoring junior students. I approach every opportunity with a growth mindset and a strong understanding of the Software Development Life Cycle (SDLC), aiming to continuously learn and build impactful solutions.</p>
+    <div class="about-sec">
+      <h3>🌟 My Journey</h3>
+      <p class="about-text">
+        I have solved over 600 problems on Skillrack, which has significantly improved my logical thinking and coding skills. I am actively working on strengthening my understanding of core concepts and gradually exploring areas like web development and application design.
+        <br><br>
+        I am eager to learn new technologies, gain practical experience, and grow into a full-stack developer over time. I approach learning with consistency and discipline, focusing on building real skills rather than rushing into advanced areas without a strong base.
+      </p>
     </div>
 
-    <div class="about-section">
-      <h3>📬 Contact</h3>
-      <p class="about-p">Interested in collaborating or have questions about my projects? Feel free to reach out!</p>
-      <div style="display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;">
-        <span class="skill-pill">📧 nivetha.s@nec.edu.in</span>
-        <span class="skill-pill">💼 LinkedIn</span>
-        <span class="skill-pill">🐙 GitHub</span>
+    <div class="about-sec">
+      <h3>📬 Get in Touch</h3>
+      <p class="about-text">Feel free to connect — always happy to collaborate or talk about tech!</p>
+      <div class="contact-chips">
+        <a class="contact-chip" href="mailto:nivetha.s@nec.edu.in">📧 nivetha.s@nec.edu.in</a>
+        <a class="contact-chip" href="#" onclick="toast('Opening LinkedIn…','')">💼 LinkedIn</a>
+        <a class="contact-chip" href="#" onclick="toast('Opening GitHub…','')">🐙 GitHub</a>
+        <a class="contact-chip" href="#" onclick="toast('Opening Portfolio…','')">🌐 Portfolio</a>
       </div>
     </div>
   </div>
 </div>
 
-<!-- BOOK DETAIL MODAL -->
-<div class="modal-bg" id="modalBg" onclick="closeModal(event)">
+<!-- ══════════ BOOK MODAL ══════════ -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
   <div class="modal" id="bookModal">
-    <div class="modal-header">
-      <h3 id="modalTitle">Book Title</h3>
-      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    <div class="modal-head">
+      <h3 id="mTitle">Book</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
-      <div class="modal-cover" id="modalCover"></div>
-      <div class="modal-detail" id="modalDetails"></div>
-      <div id="modalAddCart"></div>
-      <hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">
-      <h4 style="font-family:'Playfair Display',serif;font-size:16px;margin-bottom:12px;">Rate & Review</h4>
-      <div class="rating-input" id="ratingInput"></div>
-      <textarea class="review-textarea" id="reviewText" placeholder="Share your thoughts about this book…"></textarea>
-      <br>
-      <button class="submit-review-btn" onclick="submitReview()">Submit Review</button>
+      <div class="modal-cover" id="mCover"><span id="mCoverTitle"></span></div>
+      <div class="detail-grid" id="mDetails"></div>
+      <div id="mAddBtn"></div>
+      <hr class="divider">
+      <h4 style="font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;margin-bottom:8px">Rate &amp; Review</h4>
+      <div class="rating-row" id="ratingRow"></div>
+      <textarea class="review-textarea" id="reviewText" placeholder="Write your thoughts about this book…"></textarea>
+      <button class="btn btn-amber btn-sm" onclick="submitReview()">Submit Review</button>
       <div class="reviews-list" id="reviewsList"></div>
     </div>
   </div>
 </div>
 
 <script>
-// ─── DATA ───────────────────────────────────────────────────────────────────
+/* DATA */
 const BOOKS = [
-  { id:1, title:"The Eternal Bloom", author:"Aria Weston", category:"romantic", price:399, original:549, cover:"#c0472b", desc:"A sweeping love story across three continents and two lifetimes, weaving magic realism with heartbreak and hope.", badge:"hot", available:true, membersBought:2341, rating:4.5, ratingCount:312, sharedViewed:87 },
-  { id:2, title:"Midnight Whispers", author:"Elena Cross", category:"romantic", price:299, original:399, cover:"#7c3f8e", desc:"When two strangers share a rainy night in Paris, their lives intertwine in ways neither could have predicted.", badge:"new", available:true, membersBought:1890, rating:4.2, ratingCount:210, sharedViewed:64 },
-  { id:3, title:"The Last Page", author:"James Hollow", category:"horror", price:349, original:499, cover:"#2d3436", desc:"A cursed manuscript that kills anyone who reads its final page — and the librarian who must stop it.", badge:"hot", available:true, membersBought:3102, rating:4.7, ratingCount:489, sharedViewed:132 },
-  { id:4, title:"Shadows of Ravenwood", author:"D.K. Marsh", category:"horror", price:279, original:null, cover:"#1e3a5f", desc:"An abandoned manor, a family secret, and a darkness that refuses to stay buried.", badge:null, available:true, membersBought:987, rating:4.0, ratingCount:143, sharedViewed:45 },
-  { id:5, title:"The Cipher Code", author:"Sam Aldridge", category:"mystery", price:449, original:599, cover:"#2d6a4f", desc:"A brilliant detective unravels a code that could expose the most powerful conspiracy in history.", badge:"sale", available:true, membersBought:4211, rating:4.8, ratingCount:671, sharedViewed:208 },
-  { id:6, title:"Unseen Hands", author:"Tara Quinn", category:"mystery", price:329, original:null, cover:"#805b10", desc:"She was the only witness. Now she's the prime suspect. A race against time in a city of secrets.", badge:"new", available:false, membersBought:1234, rating:4.3, ratingCount:198, sharedViewed:56 },
-  { id:7, title:"The Dragon's Heir", author:"Marin Cole", category:"fantasy", price:499, original:699, cover:"#c0392b", desc:"A forbidden throne, an ancient bloodline, and a young woman who must choose between love and power.", badge:"hot", available:true, membersBought:5678, rating:4.9, ratingCount:1024, sharedViewed:340 },
-  { id:8, title:"Starweaver", author:"Lyra Nash", category:"fantasy", price:389, original:499, cover:"#1a3c6e", desc:"The stars are messages. Only she can read them. A coming-of-age epic in a world where light has a language.", badge:null, available:true, membersBought:2109, rating:4.6, ratingCount:387, sharedViewed:120 },
-  { id:9, title:"Atomic Habits", author:"James Clear (Adapted)", category:"self-help", price:299, original:399, cover:"#27ae60", desc:"Tiny changes, remarkable results. Build better habits by understanding the science of behaviour.", badge:"hot", available:true, membersBought:12400, rating:4.9, ratingCount:3201, sharedViewed:980 },
-  { id:10, title:"The 5AM Club", author:"Robin Sharma", category:"self-help", price:249, original:349, cover:"#e67e22", desc:"Conquer your mornings, elevate your life — the power ritual used by icons, titans and billionaires.", badge:null, available:true, membersBought:8900, rating:4.4, ratingCount:1890, sharedViewed:430 },
-  { id:11, title:"Dune", author:"Frank Herbert", category:"sci-fi", price:499, original:649, cover:"#7d5a00", desc:"The desert planet Arrakis, the spice Melange, and the young man destined to become a legend.", badge:"sale", available:true, membersBought:9821, rating:5.0, ratingCount:4102, sharedViewed:1200 },
-  { id:12, title:"Klara and the Sun", author:"Kazuo Ishiguro", category:"sci-fi", price:359, original:null, cover:"#2c3e50", desc:"An Artificial Friend narrates the world through wide, compassionate eyes in this tender story of love and sacrifice.", badge:"new", available:true, membersBought:3421, rating:4.6, ratingCount:567, sharedViewed:189 },
-  { id:13, title:"Steve Jobs", author:"Walter Isaacson", category:"biography", price:449, original:599, cover:"#34495e", desc:"The legendary biography of the visionary who transformed six industries and changed the world forever.", badge:null, available:true, membersBought:15000, rating:4.8, ratingCount:5210, sharedViewed:2100 },
-  { id:14, title:"Michelle Obama: Becoming", author:"Michelle Obama", category:"biography", price:399, original:499, cover:"#8e44ad", desc:"An intimate and powerful memoir by the former First Lady of the United States.", badge:null, available:false, membersBought:22000, rating:4.9, ratingCount:8900, sharedViewed:3450 },
-  { id:15, title:"Pride and Prejudice", author:"Jane Austen", category:"classics", price:149, original:199, cover:"#6d4c41", desc:"The timeless tale of love, manners, and misunderstandings — Darcy and Elizabeth await.", badge:"sale", available:true, membersBought:31000, rating:5.0, ratingCount:12000, sharedViewed:5600 },
-  { id:16, title:"1984", author:"George Orwell", category:"classics", price:179, original:null, cover:"#263238", desc:"Big Brother is watching. In a world of doublethink and perpetual war, one man dares to rebel.", badge:null, available:true, membersBought:28000, rating:4.9, ratingCount:9800, sharedViewed:4200 },
+  {id:1,title:"The Eternal Bloom",author:"Aria Weston",cat:"romantic",price:399,orig:549,color:"#7b2d42",
+   desc:"A sweeping love story across three continents and two lifetimes, blending magic realism with heartbreak and hope.",badge:"hot",avail:true,bought:2341,rating:4.5,ratingCt:312,viewed:87},
+  {id:2,title:"Midnight Whispers",author:"Elena Cross",cat:"romantic",price:299,orig:399,color:"#5c2d6e",
+   desc:"When two strangers share a rainy night in Paris, their lives intertwine in ways neither could have predicted.",badge:"new",avail:true,bought:1890,rating:4.2,ratingCt:210,viewed:64},
+  {id:3,title:"Love in the Algorithm",author:"Priya Rao",cat:"romantic",price:349,orig:null,color:"#8b3a62",
+   desc:"A data scientist falls for a fellow coder through late-night debugging sessions — can love survive a product launch?",badge:null,avail:true,bought:1120,rating:4.0,ratingCt:95,viewed:38},
+  {id:4,title:"The Last Page",author:"James Hollow",cat:"horror",price:349,orig:499,color:"#1a1a2e",
+   desc:"A cursed manuscript that kills anyone who reads its final page — and the librarian who must stop it.",badge:"hot",avail:true,bought:3102,rating:4.7,ratingCt:489,viewed:132},
+  {id:5,title:"Shadows of Ravenwood",author:"D.K. Marsh",cat:"horror",price:279,orig:null,color:"#16213e",
+   desc:"An abandoned manor, a family secret, and a darkness that absolutely refuses to stay buried.",badge:null,avail:true,bought:987,rating:4.0,ratingCt:143,viewed:45},
+  {id:6,title:"Whispering Walls",author:"Sara Night",cat:"horror",price:319,orig:399,color:"#2d1b33",
+   desc:"The house whispers only at 3AM. The new tenant is starting to understand what it wants.",badge:"new",avail:false,bought:654,rating:3.9,ratingCt:78,viewed:29},
+  {id:7,title:"The Cipher Code",author:"Sam Aldridge",cat:"mystery",price:449,orig:599,color:"#1c3a2a",
+   desc:"A brilliant detective unravels a code that could expose the most powerful conspiracy in modern history.",badge:"sale",avail:true,bought:4211,rating:4.8,ratingCt:671,viewed:208},
+  {id:8,title:"Unseen Hands",author:"Tara Quinn",cat:"mystery",price:329,orig:null,color:"#3d2a00",
+   desc:"She was the only witness. Now she's the prime suspect. A race against time in a city of secrets.",badge:null,avail:false,bought:1234,rating:4.3,ratingCt:198,viewed:56},
+  {id:9,title:"The Dragon's Heir",author:"Marin Cole",cat:"fantasy",price:499,orig:699,color:"#4a1515",
+   desc:"A forbidden throne, an ancient bloodline, and a young woman who must choose between love and absolute power.",badge:"hot",avail:true,bought:5678,rating:4.9,ratingCt:1024,viewed:340},
+  {id:10,title:"Starweaver",author:"Lyra Nash",cat:"fantasy",price:389,orig:499,color:"#0f2044",
+   desc:"The stars are messages. Only she can read them. A coming-of-age epic in a world where light has a language.",badge:null,avail:true,bought:2109,rating:4.6,ratingCt:387,viewed:120},
+  {id:11,title:"Atomic Habits",author:"James Clear",cat:"self-help",price:299,orig:399,color:"#1a3a1a",
+   desc:"Tiny changes, remarkable results. Build better habits by understanding the science of behaviour.",badge:"hot",avail:true,bought:12400,rating:4.9,ratingCt:3201,viewed:980},
+  {id:12,title:"The 5AM Club",author:"Robin Sharma",cat:"self-help",price:249,orig:349,color:"#3a2200",
+   desc:"Conquer your mornings, elevate your life — the power ritual used by icons, titans and billionaires.",badge:null,avail:true,bought:8900,rating:4.4,ratingCt:1890,viewed:430},
+  {id:13,title:"Dune",author:"Frank Herbert",cat:"sci-fi",price:499,orig:649,color:"#3a2800",
+   desc:"The desert planet Arrakis, the spice Melange, and the young man destined to become a legend.",badge:"sale",avail:true,bought:9821,rating:5.0,ratingCt:4102,viewed:1200},
+  {id:14,title:"Klara and the Sun",author:"Kazuo Ishiguro",cat:"sci-fi",price:359,orig:null,color:"#1a2a3a",
+   desc:"An Artificial Friend narrates the world with wide, compassionate eyes in this tender story of love and sacrifice.",badge:"new",avail:true,bought:3421,rating:4.6,ratingCt:567,viewed:189},
+  {id:15,title:"Steve Jobs",author:"Walter Isaacson",cat:"biography",price:449,orig:599,color:"#1e1e1e",
+   desc:"The legendary biography of the visionary who transformed six industries and changed the world forever.",badge:null,avail:true,bought:15000,rating:4.8,ratingCt:5210,viewed:2100},
+  {id:16,title:"Becoming",author:"Michelle Obama",cat:"biography",price:399,orig:499,color:"#1a0a2e",
+   desc:"An intimate and powerful memoir by the former First Lady of the United States.",badge:null,avail:true,bought:22000,rating:4.9,ratingCt:8900,viewed:3450},
+  {id:17,title:"Pride and Prejudice",author:"Jane Austen",cat:"classics",price:149,orig:199,color:"#3b2000",
+   desc:"The timeless tale of love, manners, and misunderstandings — Darcy and Elizabeth have waited long enough.",badge:"sale",avail:true,bought:31000,rating:5.0,ratingCt:12000,viewed:5600},
+  {id:18,title:"1984",author:"George Orwell",cat:"classics",price:179,orig:null,color:"#0d1117",
+   desc:"Big Brother is watching. In a world of doublethink and perpetual war, one man dares to rebel.",badge:null,avail:true,bought:28000,rating:4.9,ratingCt:9800,viewed:4200},
 ];
 
-let cart = JSON.parse(localStorage.getItem('pt_cart') || '[]');
-let orders = JSON.parse(localStorage.getItem('pt_orders') || '[]');
-let reviews = JSON.parse(localStorage.getItem('pt_reviews') || '{}');
-let currentFilter = 'all';
-let currentBook = null;
-let selectedRating = 0;
+/* STATE */
+let cart    = JSON.parse(localStorage.getItem('fv_cart')    || '[]');
+let orders  = JSON.parse(localStorage.getItem('fv_orders')  || '[]');
+let reviews = JSON.parse(localStorage.getItem('fv_reviews') || '{}');
+let currentCat  = 'all';
+let searchQuery = '';
+let activeBook  = null;
+let selectedStar = 0;
 
-// ─── PAGES ──────────────────────────────────────────────────────────────────
-function showPage(name) {
+/* INIT */
+updateCartBadge();
+renderBooks();
+
+/* ── NAVIGATION ── */
+function goPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  if (name === 'cart') renderCart();
+  document.getElementById('pg-' + name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const nb = document.getElementById('nb-' + name);
+  if (nb) nb.classList.add('active');
+  if (name === 'cart')   renderCart();
   if (name === 'orders') { document.getElementById('ordersList').innerHTML = ''; }
+  if (name === 'track')  { document.getElementById('trackResults').innerHTML = ''; }
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 
-// ─── TOAST ──────────────────────────────────────────────────────────────────
-function toast(msg) {
-  const t = document.createElement('div');
-  t.className = 'toast-msg'; t.textContent = msg;
-  document.getElementById('toast').appendChild(t);
-  setTimeout(() => t.remove(), 3100);
+function scrollToBooks() {
+  document.getElementById('booksSection').scrollIntoView({behavior:'smooth'});
 }
 
-// ─── RENDER BOOKS ────────────────────────────────────────────────────────────
-function getDeliveryDate(days = 3) {
-  const d = new Date(); d.setDate(d.getDate() + days);
-  return d.toLocaleDateString('en-IN', { weekday:'short', month:'short', day:'numeric' });
+/* ── SEARCH ── */
+function onSearch(val) {
+  searchQuery = val.trim().toLowerCase();
+  document.getElementById('searchClear').classList.toggle('show', val.length > 0);
+  renderBooks();
+}
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  searchQuery = '';
+  document.getElementById('searchClear').classList.remove('show');
+  renderBooks();
 }
 
-function renderStars(rating) {
-  let s = '';
-  for (let i = 1; i <= 5; i++) {
-    s += `<span class="star ${i <= Math.round(rating) ? '' : 'empty'}">★</span>`;
-  }
-  return s + `<span class="rating-count">(${rating})</span>`;
+/* ── CATEGORIES ── */
+function setCategory(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  searchQuery = '';
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchClear').classList.remove('show');
+  renderBooks();
 }
 
-function inCart(id) { return cart.some(c => c.id === id); }
+/* ── RENDER BOOKS ── */
+function filteredBooks() {
+  return BOOKS.filter(b => {
+    const catOk = currentCat === 'all' || b.cat === currentCat;
+    if (!searchQuery) return catOk;
+    const q = searchQuery;
+    return (b.title + ' ' + b.author + ' ' + b.cat + ' ' + b.desc).toLowerCase().includes(q);
+  });
+}
 
-function renderBooks(books) {
+function starsHTML(r) {
+  let h = '<div class="stars">';
+  for (let i=1;i<=5;i++) h += `<span class="${i<=Math.round(r)?'':'dim'}">★</span>`;
+  return h + `</div><span class="rating-ct">(${r})</span>`;
+}
+
+function deliveryDate(days) {
+  const d = new Date(); d.setDate(d.getDate()+days);
+  return d.toLocaleDateString('en-IN',{weekday:'short',month:'short',day:'numeric'});
+}
+
+function inCart(id) { return cart.some(c=>c.id===id); }
+
+function renderBooks() {
+  const list = filteredBooks();
   const grid = document.getElementById('bookGrid');
-  document.getElementById('bookCount').textContent = books.length + ' books';
-  if (!books.length) {
-    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="icon">📭</div><h3>No books found</h3><p>Try a different search or category.</p></div>`;
+  const labels = {romantic:'Romantic',horror:'Horror',mystery:'Mystery',fantasy:'Fantasy','self-help':'Self-Help','sci-fi':'Sci-Fi',biography:'Biography',classics:'Classics'};
+  let t = searchQuery
+    ? `Results for "${document.getElementById('searchInput').value}"`
+    : (currentCat === 'all' ? 'Featured Books' : (labels[currentCat]||currentCat) + ' Books');
+  document.getElementById('secTitle').textContent = t;
+  document.getElementById('secCount').textContent = list.length + ' books';
+
+  if (!list.length) {
+    grid.innerHTML = `<div class="no-results"><div class="nr-icon">📭</div><h3>No books found</h3><p>Try a different search or category.</p></div>`;
     return;
   }
-  grid.innerHTML = books.map(b => `
+
+  grid.innerHTML = list.map(b => `
     <div class="book-card" onclick="openBook(${b.id})">
-      <div class="book-cover" style="background:${b.cover}">
-        ${b.badge ? `<span class="badge-${b.badge}">${b.badge.toUpperCase()}</span>` : ''}
-        ${b.title}
-        ${!b.available ? `<div class="unavailable-overlay">OUT OF STOCK</div>` : ''}
+      <div class="cover" style="background:${b.color}">
+        <div class="cover-spine"></div>
+        ${b.badge ? `<div class="badge badge-${b.badge}">${b.badge.toUpperCase()}</div>` : ''}
+        ${!b.avail ? '<div class="oos-overlay">Out of Stock</div>' : ''}
+        <div class="cover-title">${b.title}</div>
       </div>
-      <div class="book-info">
+      <div class="book-body">
         <div class="book-title">${b.title}</div>
+        <div class="book-author">by ${b.author}</div>
         <div class="book-desc">${b.desc}</div>
-        <div class="book-meta">
-          <div class="book-price">₹${b.price}${b.original ? `<span class="original">₹${b.original}</span>` : ''}</div>
+        <div class="book-price-row">
+          <span class="price">₹${b.price}</span>
+          ${b.orig ? `<span class="price-orig">₹${b.orig}</span>` : ''}
         </div>
-        <div class="stars">${renderStars(b.rating)} <span class="rating-count">${b.ratingCount.toLocaleString()}</span></div>
-        <div class="members-bought">✅ ${b.membersBought.toLocaleString()}+ members bought</div>
-        <div class="delivery-date">📦 Delivery by <b>${getDeliveryDate(3)}</b></div>
-        <button class="add-to-cart ${inCart(b.id) ? 'in-cart' : ''}" onclick="event.stopPropagation();addToCart(${b.id})">
-          ${inCart(b.id) ? '✓ Added' : '🛒 Add to Cart'}
+        <div class="stars-row">${starsHTML(b.rating)}</div>
+        <div class="members-txt">✅ ${b.bought.toLocaleString()}+ members bought</div>
+        <div class="delivery-txt">📦 Delivery by <b>${deliveryDate(3)}</b></div>
+        <button class="add-btn${inCart(b.id)?' in-cart':''}${!b.avail?' ':''}"
+          onclick="event.stopPropagation();cartAction(${b.id})"
+          ${!b.avail?'disabled':''}>
+          ${inCart(b.id) ? '✓ Added to Cart' : (b.avail ? '🛒 Add to Cart' : '🚫 Unavailable')}
         </button>
       </div>
-      <div class="shared-viewed">👁 ${b.sharedViewed} people viewed this recently</div>
+      <div class="shared-txt">👁 ${b.viewed} people viewed this recently</div>
     </div>
   `).join('');
 }
 
-function filterCategory(cat, btn) {
-  currentFilter = cat;
-  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('sectionTitle').textContent = cat === 'all' ? 'Featured Books' : cat.charAt(0).toUpperCase() + cat.slice(1) + ' Books';
-  const filtered = cat === 'all' ? BOOKS : BOOKS.filter(b => b.category === cat);
-  renderBooks(filtered);
-}
-
-function handleSearch() {
-  const q = document.getElementById('searchInput').value.toLowerCase();
-  if (!q) { filterCategory(currentFilter, document.querySelector('.cat-pill.active')); return; }
-  const filtered = BOOKS.filter(b => b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q) || b.category.toLowerCase().includes(q) || b.desc.toLowerCase().includes(q));
-  document.getElementById('sectionTitle').textContent = `Search: "${document.getElementById('searchInput').value}"`;
-  renderBooks(filtered);
-}
-
-// ─── CART ────────────────────────────────────────────────────────────────────
-function addToCart(id) {
-  const book = BOOKS.find(b => b.id === id);
-  if (!book.available) { toast('Sorry, this book is out of stock.'); return; }
-  const existing = cart.find(c => c.id === id);
-  if (existing) { existing.qty++; } else { cart.push({ ...book, qty: 1 }); }
-  saveCart(); updateCartBadge(); renderBooks(currentFilter === 'all' ? BOOKS : BOOKS.filter(b => b.category === currentFilter));
-  toast(`"${book.title}" added to cart!`);
-}
-
-function saveCart() { localStorage.setItem('pt_cart', JSON.stringify(cart)); }
-
-function updateCartBadge() {
-  const total = cart.reduce((a, c) => a + c.qty, 0);
-  document.getElementById('cartBadge').textContent = total;
-}
-
-function renderCart() {
-  const container = document.getElementById('cartItems');
-  if (!cart.length) {
-    container.innerHTML = `<div class="empty-state"><div class="icon">🛒</div><h3>Your cart is empty</h3><p>Browse books and add your favourites.</p></div>`;
-    document.getElementById('subtotal').textContent = '₹0';
-    document.getElementById('shipping').textContent = '₹0';
-    document.getElementById('discount').textContent = '-₹0';
-    document.getElementById('total').textContent = '₹0';
-    return;
-  }
-  container.innerHTML = cart.map(item => `
-    <div class="cart-item">
-      <div class="cart-cover" style="background:${item.cover}">${item.title.substring(0,10)}</div>
-      <div class="cart-item-name">
-        <b>${item.title}</b>
-        <span>${item.author}</span>
-      </div>
-      <div class="qty-ctrl">
-        <button class="qty-btn" onclick="changeQty(${item.id},-1)">−</button>
-        <span class="qty-val">${item.qty}</span>
-        <button class="qty-btn" onclick="changeQty(${item.id},1)">+</button>
-      </div>
-      <div class="cart-item-price">₹${item.price * item.qty}</div>
-      <button class="remove-btn" onclick="removeFromCart(${item.id})" title="Remove">✕</button>
-    </div>
-  `).join('');
-
-  const sub = cart.reduce((a, c) => a + c.price * c.qty, 0);
-  const ship = sub >= 499 ? 0 : 40;
-  const orig = cart.reduce((a, c) => a + (c.original || c.price) * c.qty, 0);
-  const disc = orig - sub;
-  document.getElementById('subtotal').textContent = '₹' + sub;
-  document.getElementById('shipping').textContent = ship === 0 ? 'FREE' : '₹' + ship;
-  document.getElementById('discount').textContent = '-₹' + disc;
-  document.getElementById('total').textContent = '₹' + (sub + ship);
-}
-
-function changeQty(id, delta) {
-  const item = cart.find(c => c.id === id);
-  if (!item) return;
-  item.qty += delta;
-  if (item.qty <= 0) { cart = cart.filter(c => c.id !== id); }
-  saveCart(); updateCartBadge(); renderCart();
+/* ── CART ACTIONS ── */
+function cartAction(id) {
+  const book = BOOKS.find(b=>b.id===id);
+  if (!book||!book.avail) { toast('This book is currently out of stock.','error'); return; }
+  const ex = cart.find(c=>c.id===id);
+  if (ex) ex.qty++;
+  else cart.push({...book, qty:1});
+  saveCart(); updateCartBadge(); renderBooks();
+  toast(`"${book.title}" added to cart! 🛒`,'success');
 }
 
 function removeFromCart(id) {
-  cart = cart.filter(c => c.id !== id);
+  cart = cart.filter(c=>c.id!==id);
   saveCart(); updateCartBadge(); renderCart();
-  toast('Item removed from cart.');
+  toast('Item removed from cart.','');
 }
 
-// ─── ORDER ────────────────────────────────────────────────────────────────────
-function placeOrder() {
-  const email = document.getElementById('checkoutEmail').value.trim();
-  const name = document.getElementById('checkoutName').value.trim();
-  const city = document.getElementById('checkoutCity').value.trim();
-  const state = document.getElementById('checkoutState').value.trim();
-  if (!email || !name || !city) { toast('Please fill in your email, name & city.'); return; }
-  if (!cart.length) { toast('Your cart is empty!'); return; }
-
-  const orderId = 'PT' + Date.now().toString().slice(-8);
-  const statuses = ['Ordered', 'Packed', 'Shipped', 'Delivered'];
-  const order = {
-    id: orderId, email, name, city, state,
-    items: [...cart],
-    total: cart.reduce((a, c) => a + c.price * c.qty, 0) + (cart.reduce((a, c) => a + c.price * c.qty, 0) >= 499 ? 0 : 40),
-    status: 'Ordered',
-    date: new Date().toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }),
-    deliveryDate: getDeliveryDate(3),
-  };
-  orders.push(order);
-  localStorage.setItem('pt_orders', JSON.stringify(orders));
-  cart = []; saveCart(); updateCartBadge();
-  toast(`🎉 Order ${orderId} placed! Estimated delivery by ${order.deliveryDate}`);
-  document.getElementById('checkoutEmail').value = '';
-  document.getElementById('checkoutName').value = '';
-  document.getElementById('checkoutCity').value = '';
-  document.getElementById('checkoutState').value = '';
-  showPage('orders');
-  document.getElementById('ordersEmailInput').value = email;
-  loadOrders();
+function changeQty(id, delta) {
+  const item = cart.find(c=>c.id===id);
+  if (!item) return;
+  item.qty += delta;
+  if (item.qty<=0) cart = cart.filter(c=>c.id!==id);
+  saveCart(); updateCartBadge(); renderCart();
 }
 
-// ─── TRACK ────────────────────────────────────────────────────────────────────
-function trackOrder() {
-  const email = document.getElementById('trackEmail').value.trim().toLowerCase();
-  const result = document.getElementById('trackResult');
-  const myOrders = orders.filter(o => o.email.toLowerCase() === email);
-  if (!email) { toast('Please enter your email.'); return; }
-  if (!myOrders.length) {
-    result.className = 'order-result show';
-    result.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>No orders found</h3><p>No orders placed with this email address.</p></div>`;
+function saveCart() { localStorage.setItem('fv_cart', JSON.stringify(cart)); }
+
+function updateCartBadge() {
+  document.getElementById('cartCount').textContent = cart.reduce((a,c)=>a+c.qty,0);
+}
+
+/* ── RENDER CART ── */
+function renderCart() {
+  const wrap = document.getElementById('cartItems');
+  if (!cart.length) {
+    wrap.innerHTML = `<div class="empty"><div class="ei">🛒</div><h3>Your cart is empty</h3><p>Browse books and add your favourites!</p></div>`;
+    ['sumSub','sumShip','sumSave','sumTotal'].forEach(id => document.getElementById(id).textContent='₹0');
     return;
   }
-  const statusOrder = ['Ordered','Packed','Shipped','Delivered'];
-  result.className = 'order-result show';
-  result.innerHTML = myOrders.reverse().map(o => {
-    const si = statusOrder.indexOf(o.status);
-    return `
-    <div style="margin-bottom:24px;">
-      <div class="order-info">
-        <h4>Order #${o.id}</h4>
-        <div class="order-meta">
-          <div class="order-meta-item"><label>Date</label>${o.date}</div>
-          <div class="order-meta-item"><label>City</label>${o.city}</div>
-          <div class="order-meta-item"><label>Total</label>₹${o.total}</div>
-          <div class="order-meta-item"><label>Est. Delivery</label>${o.deliveryDate}</div>
-        </div>
+  wrap.innerHTML = cart.map(item => `
+    <div class="cart-row">
+      <div class="cart-mini-cover" style="background:${item.color}">${item.title.substring(0,14)}</div>
+      <div class="cart-info"><b>${item.title}</b><span>by ${item.author}</span></div>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="changeQty(${item.id},-1)">−</button>
+        <span class="qty-val">${item.qty}</span>
+        <button class="qty-btn" onclick="changeQty(${item.id},+1)">+</button>
       </div>
-      <div class="track-steps">
-        ${statusOrder.map((s, i) => `
-          <div class="track-step">
-            <div class="step-indicator">
-              <div class="step-dot ${i < si ? 'done' : (i === si ? 'active' : '')}">${i < si ? '✓' : (i+1)}</div>
-              ${i < statusOrder.length-1 ? `<div class="step-line ${i < si ? 'done' : ''}"></div>` : ''}
-            </div>
-            <div class="step-content">
-              <div class="step-name">${s}</div>
-              <div class="step-date">${i <= si ? (i === 0 ? o.date : 'Completed') : 'Pending'}</div>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    </div>`;
-  }).join('<hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">');
-}
-
-// ─── MY ORDERS ───────────────────────────────────────────────────────────────
-function loadOrders() {
-  const email = document.getElementById('ordersEmailInput').value.trim().toLowerCase();
-  const list = document.getElementById('ordersList');
-  if (!email) { toast('Please enter your email.'); return; }
-  const myOrders = orders.filter(o => o.email.toLowerCase() === email);
-  if (!myOrders.length) {
-    list.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>No orders found</h3><p>No orders placed with "${email}".</p></div>`;
-    return;
-  }
-  const statusClass = { Ordered:'ordered', Packed:'packed', Shipped:'shipped', Delivered:'delivered' };
-  list.innerHTML = myOrders.reverse().map(o => `
-    <div class="order-card">
-      <div class="order-card-head">
-        <div>
-          <div class="order-id">Order #${o.id} · ${o.date}</div>
-          <div style="font-size:13px;color:var(--muted);margin-top:4px;">📍 ${o.city}${o.state ? ', '+o.state : ''} · 📦 Est. ${o.deliveryDate}</div>
-        </div>
-        <span class="order-status-badge status-${statusClass[o.status]}">${o.status}</span>
-      </div>
-      <div class="order-items-list">${o.items.map(i => `${i.title} × ${i.qty}`).join(' · ')}</div>
-      <div class="order-total-row">
-        <span style="font-size:13px;color:var(--muted);">${o.items.reduce((a,i)=>a+i.qty,0)} items</span>
-        <b>₹${o.total}</b>
-      </div>
+      <div class="cart-price">₹${item.price * item.qty}</div>
+      <button class="btn-ghost" onclick="removeFromCart(${item.id})" title="Remove">✕</button>
     </div>
   `).join('');
+
+  const sub  = cart.reduce((a,c)=>a+c.price*c.qty,0);
+  const origT= cart.reduce((a,c)=>a+(c.orig||c.price)*c.qty,0);
+  const ship  = sub>=499 ? 0 : 40;
+  const save  = origT - sub;
+  document.getElementById('sumSub').textContent   = '₹'+sub;
+  document.getElementById('sumShip').textContent  = ship===0 ? 'FREE 🎉' : '₹'+ship;
+  document.getElementById('sumSave').textContent  = '₹'+save;
+  document.getElementById('sumTotal').textContent = '₹'+(sub+ship);
 }
 
-// ─── BOOK MODAL ───────────────────────────────────────────────────────────────
+/* ── PLACE ORDER ── */
+function placeOrder() {
+  const email = document.getElementById('coEmail').value.trim();
+  const name  = document.getElementById('coName').value.trim();
+  const city  = document.getElementById('coCity').value.trim();
+  const state = document.getElementById('coState').value.trim();
+  if (!email) { toast('Please enter your email address.','error'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast('Please enter a valid email address.','error'); return; }
+  if (!name)  { toast('Please enter your full name.','error'); return; }
+  if (!city)  { toast('Please enter your delivery city.','error'); return; }
+  if (!cart.length) { toast('Your cart is empty!','error'); return; }
+
+  const orderId = 'FV' + Date.now().toString().slice(-8).toUpperCase();
+  const sub  = cart.reduce((a,c)=>a+c.price*c.qty,0);
+  const ship = sub>=499 ? 0 : 40;
+
+  const order = {
+    id:orderId, email:email.toLowerCase(), name, city, state,
+    items:cart.map(c=>({title:c.title,author:c.author,qty:c.qty,price:c.price,color:c.color})),
+    total:sub+ship, status:'Ordered',
+    date:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}),
+    deliveryDate:deliveryDate(3), placedAt:Date.now(),
+  };
+  orders.push(order);
+  localStorage.setItem('fv_orders', JSON.stringify(orders));
+  cart=[]; saveCart(); updateCartBadge(); renderCart();
+  ['coEmail','coName','coCity','coState'].forEach(id=>document.getElementById(id).value='');
+  toast(`🎉 Order ${orderId} placed! Est. delivery: ${order.deliveryDate}`,'success');
+  setTimeout(()=>{ goPage('orders'); document.getElementById('ordEmail').value=email; loadOrders(); }, 900);
+}
+
+/* ── TRACK ORDER ── */
+function doTrack() {
+  const email = document.getElementById('trackEmail').value.trim().toLowerCase();
+  const res   = document.getElementById('trackResults');
+  if (!email) { toast('Please enter your email address.','error'); return; }
+  const mine = orders.filter(o=>o.email===email);
+  if (!mine.length) {
+    res.innerHTML = `<div class="empty"><div class="ei">📭</div><h3>No orders found</h3><p>No orders for <b>${email}</b>.</p></div>`;
+    return;
+  }
+  const STEPS = ['Ordered','Packed','Shipped','Delivered'];
+  res.innerHTML = [...mine].reverse().map(o => {
+    const si = STEPS.indexOf(o.status);
+    const steps = STEPS.map((s,i)=>`
+      <div class="step">
+        <div class="step-left">
+          <div class="step-dot ${i<si?'done':(i===si?'current':'')}">${i<si?'✓':(i+1)}</div>
+          ${i<STEPS.length-1?`<div class="step-line ${i<si?'done':''}"></div>`:''}
+        </div>
+        <div class="step-content">
+          <div class="step-label">${s}</div>
+          <div class="step-sub">${i<si?'Completed':(i===si?'In Progress':'Pending')}</div>
+        </div>
+      </div>`).join('');
+    return `
+      <div class="order-block">
+        <div class="order-header-info">
+          <h4>Order #${o.id}</h4>
+          <div class="meta-grid">
+            <div class="meta-item"><label>Placed</label><span>${o.date}</span></div>
+            <div class="meta-item"><label>City</label><span>${o.city}${o.state?', '+o.state:''}</span></div>
+            <div class="meta-item"><label>Est. Delivery</label><span>${o.deliveryDate}</span></div>
+            <div class="meta-item"><label>Total</label><span style="color:var(--amber);font-family:'JetBrains Mono',monospace">₹${o.total}</span></div>
+          </div>
+        </div>
+        <div class="stepper">${steps}</div>
+      </div>`;
+  }).join('');
+}
+
+/* ── MY ORDERS ── */
+function loadOrders() {
+  const email = document.getElementById('ordEmail').value.trim().toLowerCase();
+  const list  = document.getElementById('ordersList');
+  if (!email) { toast('Please enter your email address.','error'); return; }
+  const mine = orders.filter(o=>o.email===email);
+  if (!mine.length) {
+    list.innerHTML = `<div class="empty"><div class="ei">📭</div><h3>No orders found</h3><p>No orders for <b>${email}</b> yet.</p></div>`;
+    return;
+  }
+  const sC = {Ordered:'s-ordered',Packed:'s-packed',Shipped:'s-shipped',Delivered:'s-delivered'};
+  list.innerHTML = [...mine].reverse().map(o=>`
+    <div class="ord-card">
+      <div class="ord-top">
+        <div>
+          <span class="ord-id">Order #${o.id}</span>
+          <span class="ord-date">Placed ${o.date} · Est. delivery: ${o.deliveryDate} · ${o.city}${o.state?', '+o.state:''}</span>
+        </div>
+        <span class="status-pill ${sC[o.status]||'s-ordered'}">${o.status}</span>
+      </div>
+      <div class="ord-items">${o.items.map(i=>`${i.title} × ${i.qty}`).join(' &nbsp;·&nbsp; ')}</div>
+      <div class="ord-bottom">
+        <span style="font-size:12px;color:var(--muted)">${o.items.reduce((a,i)=>a+i.qty,0)} item(s)</span>
+        <span class="ord-total">₹${o.total}</span>
+      </div>
+    </div>`).join('');
+}
+
+/* ── BOOK MODAL ── */
 function openBook(id) {
-  currentBook = BOOKS.find(b => b.id === id);
-  selectedRating = 0;
-  const b = currentBook;
-  document.getElementById('modalTitle').textContent = b.title;
-  document.getElementById('modalCover').style.background = b.cover;
-  document.getElementById('modalCover').textContent = b.title;
-  document.getElementById('modalDetails').innerHTML = `
-    <div class="modal-detail-item"><label>Author</label><span>${b.author}</span></div>
-    <div class="modal-detail-item"><label>Category</label><span style="text-transform:capitalize">${b.category}</span></div>
-    <div class="modal-detail-item"><label>Price</label><span style="font-family:'DM Mono',monospace">₹${b.price}${b.original ? ` <s style="color:var(--muted);font-size:12px">₹${b.original}</s>` : ''}</span></div>
-    <div class="modal-detail-item"><label>Availability</label><span style="color:${b.available ? 'var(--sage)' : 'var(--rust)'}">${b.available ? '✅ In Stock' : '❌ Out of Stock'}</span></div>
-    <div class="modal-detail-item"><label>Rating</label><span>${b.rating} ★ (${b.ratingCount.toLocaleString()} reviews)</span></div>
-    <div class="modal-detail-item"><label>Delivery</label><span>By ${getDeliveryDate(3)}</span></div>
-    <div class="modal-detail-item" style="grid-column:1/-1"><label>Members Bought</label><span>✅ ${b.membersBought.toLocaleString()}+ members bought this</span></div>
-    <div class="modal-detail-item" style="grid-column:1/-1"><label>Description</label><span>${b.desc}</span></div>
-    <div class="modal-detail-item" style="grid-column:1/-1"><label>Return Policy</label><span>↩ Free returns within 7 days of delivery. Damaged or wrong item? Full refund.</span></div>
-    <div class="modal-detail-item" style="grid-column:1/-1"><label>Shipping</label><span>🚚 Free shipping on orders above ₹499. Standard delivery in 3 business days.</span></div>
-  `;
-  document.getElementById('modalAddCart').innerHTML = b.available ? `<button class="checkout-btn" style="max-width:200px" onclick="addToCart(${b.id});closeModalDirect()">🛒 Add to Cart</button>` : `<button class="checkout-btn" style="max-width:200px;background:var(--muted);cursor:not-allowed" disabled>Out of Stock</button>`;
-  renderRatingInput(); renderReviews();
-  document.getElementById('modalBg').classList.add('open');
+  activeBook   = BOOKS.find(b=>b.id===id);
+  selectedStar = 0;
+  const b = activeBook;
+  document.getElementById('mTitle').textContent    = b.title;
+  document.getElementById('mCover').style.background = b.color;
+  document.getElementById('mCoverTitle').textContent = b.title;
+  document.getElementById('mDetails').innerHTML = `
+    <div class="detail-item"><label>Author</label><span>${b.author}</span></div>
+    <div class="detail-item"><label>Category</label><span style="text-transform:capitalize">${b.cat}</span></div>
+    <div class="detail-item"><label>Price</label><span style="font-family:'JetBrains Mono',monospace;color:var(--amber)">₹${b.price}${b.orig?` <s style="color:var(--muted);font-size:11px">₹${b.orig}</s>`:''}</span></div>
+    <div class="detail-item"><label>Availability</label><span style="color:${b.avail?'var(--green)':'var(--red)'}">${b.avail?'✅ In Stock':'❌ Out of Stock'}</span></div>
+    <div class="detail-item"><label>Rating</label><span>${b.rating} ★ · ${b.ratingCt.toLocaleString()} reviews</span></div>
+    <div class="detail-item"><label>Est. Delivery</label><span>${deliveryDate(3)}</span></div>
+    <div class="detail-item full"><label>Members Bought</label><span style="color:var(--green)">✅ ${b.bought.toLocaleString()}+ members bought this</span></div>
+    <div class="detail-item full"><label>Description</label><span style="color:var(--muted)">${b.desc}</span></div>
+    <div class="detail-item full">
+      <div class="info-banner">↩ <strong>Return Policy:</strong> Free returns within 7 days. Damaged or wrong item — full refund guaranteed, no questions asked.</div>
+    </div>
+    <div class="detail-item full">
+      <div class="info-banner">🚚 <strong>Shipping:</strong> Free delivery on orders above ₹499. Standard delivery in 3 business days. Express also available.</div>
+    </div>`;
+  document.getElementById('mAddBtn').innerHTML = b.avail
+    ? `<button class="btn btn-amber btn-block" style="margin-bottom:4px" onclick="cartAction(${b.id});closeModal()">🛒 Add to Cart</button>`
+    : `<button class="btn btn-block" style="background:var(--surface);border:1px solid var(--border);color:var(--muted);cursor:not-allowed;margin-bottom:4px" disabled>Out of Stock</button>`;
+  renderStarInput(); renderReviews();
+  document.getElementById('reviewText').value = '';
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
 }
 
-function renderRatingInput() {
-  document.getElementById('ratingInput').innerHTML = [1,2,3,4,5].map(i =>
-    `<button class="rating-star-btn" onclick="setRating(${i})" id="rstar${i}">${i <= selectedRating ? '★' : '☆'}</button>`
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function handleOverlayClick(e) {
+  if (e.target===document.getElementById('modalOverlay')) closeModal();
+}
+
+/* ── RATINGS ── */
+function renderStarInput() {
+  document.getElementById('ratingRow').innerHTML = [1,2,3,4,5].map(i=>
+    `<button class="r-star-btn" onclick="setStar(${i})">${i<=selectedStar?'★':'☆'}</button>`
   ).join('');
 }
 
-function setRating(r) { selectedRating = r; renderRatingInput(); }
+function setStar(n) { selectedStar=n; renderStarInput(); }
 
 function submitReview() {
+  if (!selectedStar) { toast('Please select a star rating.','error'); return; }
   const text = document.getElementById('reviewText').value.trim();
-  if (!selectedRating) { toast('Please select a star rating.'); return; }
-  if (!text) { toast('Please write a short review.'); return; }
-  const id = currentBook.id;
-  if (!reviews[id]) reviews[id] = [];
-  reviews[id].unshift({ rating: selectedRating, text, date: new Date().toLocaleDateString('en-IN') });
-  localStorage.setItem('pt_reviews', JSON.stringify(reviews));
-  document.getElementById('reviewText').value = '';
-  selectedRating = 0; renderRatingInput(); renderReviews();
-  toast('Review submitted! Thank you.');
+  if (!text) { toast('Please write a short review.','error'); return; }
+  const id = activeBook.id;
+  if (!reviews[id]) reviews[id]=[];
+  reviews[id].unshift({stars:selectedStar,text,date:new Date().toLocaleDateString('en-IN')});
+  localStorage.setItem('fv_reviews',JSON.stringify(reviews));
+  document.getElementById('reviewText').value='';
+  selectedStar=0; renderStarInput(); renderReviews();
+  toast('Review submitted! Thank you 🌟','success');
 }
 
 function renderReviews() {
-  const id = currentBook.id;
-  const list = reviews[id] || [];
-  document.getElementById('reviewsList').innerHTML = list.length ? list.map(r => `
-    <div class="review-item">
-      <div class="reviewer">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)} · ${r.date}</div>
-      <div class="review-text">${r.text}</div>
-    </div>
-  `).join('') : `<p style="color:var(--muted);font-size:13px;margin-top:8px;">No reviews yet. Be the first!</p>`;
+  const id   = activeBook.id;
+  const list = reviews[id]||[];
+  document.getElementById('reviewsList').innerHTML = list.length
+    ? list.map(r=>`
+        <div class="rev-item">
+          <div class="rev-meta"><span style="color:var(--amber)">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</span><span>${r.date}</span></div>
+          <div class="rev-text">${r.text}</div>
+        </div>`).join('')
+    : '<p style="color:var(--muted);font-size:13px;margin-top:6px">No reviews yet — be the first!</p>';
 }
 
-function closeModal(e) { if (e.target === document.getElementById('modalBg')) closeModalDirect(); }
-function closeModalDirect() { document.getElementById('modalBg').classList.remove('open'); }
+/* ── TOAST ── */
+function toast(msg, type='') {
+  const el=document.createElement('div');
+  el.className='toast'+(type?' '+type:'');
+  el.textContent=msg;
+  document.getElementById('toastZone').appendChild(el);
+  setTimeout(()=>el.remove(),3100);
+}
 
-// ─── INIT ────────────────────────────────────────────────────────────────────
-updateCartBadge();
-renderBooks(BOOKS);
+/* ── KEYBOARD ── */
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&document.getElementById('modalOverlay').classList.contains('open')) closeModal();
+});
 </script>
 </body>
 </html>
